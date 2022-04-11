@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const Joi = require('joi');
 const {checkDisplayName, isEmailUnique} = require('../utils')
 
-const updateUser = async (req, res) => {
+const update = async (req, res) => {
     try {
         const userDataSchema = Joi.object({
             name: Joi.string(),
@@ -18,7 +18,9 @@ const updateUser = async (req, res) => {
 
         if(validatedData.hasOwnProperty('email')) {
             const isUnique = await isEmailUnique(validatedData.email)
-            if(!isUnique) return res.status(500).json({message: 'Duplicated email !'})
+            if(!isUnique) {
+                return res.status(500).json({message: 'Duplicated email !'})
+            }
         }
 
         if(req.user.displayName !== validatedData.displayName) {
@@ -48,5 +50,5 @@ const updateUser = async (req, res) => {
 }
 
 module.exports = {
-    updateUser
+    update
 }

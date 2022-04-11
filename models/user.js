@@ -14,7 +14,15 @@ module.exports = (sequelize, DataTypes) => {
         User.hasMany(models.Workspace,{
             as: 'workspaces',
             foreignKey: {
-                name: 'userId',
+                name: 'createdBy',
+                allowNull: false,
+                type: DataTypes.UUID
+            }
+        })
+        User.hasMany(models.Channel,{
+            as: 'channels',
+            foreignKey: {
+                name: 'createdBy',
                 allowNull: false,
                 type: DataTypes.UUID
             }

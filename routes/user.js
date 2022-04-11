@@ -1,8 +1,8 @@
 const {Router} = require('express')
 const handlers = require('../handlers/user')
 const route = Router()
-const {checkToken} = require('../middlewares/authMiddleware')
+const {isAuthenticated} = require('../middlewares/authMiddleware')
 
-route.put('/', checkToken, handlers.updateUser)
+route.put('/', isAuthenticated, handlers.update)
 
 module.exports = route

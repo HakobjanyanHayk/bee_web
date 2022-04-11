@@ -1,11 +1,11 @@
 const {Router} = require('express')
 const handlers = require('../handlers/workspace')
 const route = Router()
-const {checkToken} = require('../middlewares/authMiddleware')
+const {isAuthenticated} = require('../middlewares/authMiddleware')
 
-route.post('/', checkToken, handlers.createWorkspace)
-route.get('/:workspaceId', checkToken, handlers.getWorkspace)
-route.put('/:workspaceId', checkToken, handlers.updateWorkspace)
-route.delete('/:workspaceId', checkToken, handlers.deleteWorkspace)
+route.post('/', isAuthenticated, handlers.create)
+route.get('/:workspaceId', isAuthenticated, handlers.find)
+route.put('/:workspaceId', isAuthenticated, handlers.update)
+route.delete('/:workspaceId', isAuthenticated, handlers.remove)
 
 module.exports = route

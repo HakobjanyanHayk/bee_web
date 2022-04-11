@@ -1,7 +1,7 @@
 const { User, Workspace } = require('../models')
 const Joi = require('joi')
 
-const createWorkspace = async (req, res) => {
+const create = async (req, res) => {
     try {
         const user = await User.findByPk(req.user.id)
 
@@ -26,13 +26,18 @@ const createWorkspace = async (req, res) => {
     }
 }
 
-const getWorkspace = async (req, res) => {
+const find = async (req, res) => {
     try {
         const {workspaceId} = req.params
-        const workspace = await Workspace.findByPk(parseInt(workspaceId), {include: 'author'})
+        const workspace = await Workspace.findByPk(parseInt(workspaceId), {include: ['author', 'channels']})
 
-        if(!workspace) return res.status(404).json({message: 'Workspace not found'})
-        if(workspace.author.id !== req.user.id) return res.status(401).json({message: 'Unauthorized'})
+        if(!workspace) {
+            return res.status(404).json({message: 'Workspace not found'})
+        }
+
+        if(workspace.author.id !== req.user.id) {
+            return res.status(403).json({message: 'Unauthorized'})
+        }
 
         return res.json({workspace})
     } catch (message) {
@@ -40,7 +45,7 @@ const getWorkspace = async (req, res) => {
     }
 }
 
-const updateWorkspace = async (req, res) => {
+const update = async (req, res) => {
     try {
         const {workspaceId} = req.params
         const workspaceData = Joi.object({
@@ -54,7 +59,7 @@ const updateWorkspace = async (req, res) => {
         const workspace = await Workspace.update(
             validatedData,
             {
-                where: { id: workspaceId, userId: req.user.id },
+                where: { id: workspaceId, createdBy: req.user.id },
             }
         );
 
@@ -68,7 +73,7 @@ const updateWorkspace = async (req, res) => {
     }
 }
 
-const deleteWorkspace = async (req, res) => {
+const remove = async (req, res) => {
     try {
         const {workspaceId} = req.params
         await Workspace.destroy({ where: { id: workspaceId } });
@@ -80,8 +85,8 @@ const deleteWorkspace = async (req, res) => {
 }
 
 module.exports = {
-    createWorkspace,
-    getWorkspace,
-    updateWorkspace,
-    deleteWorkspace
+    create,
+    find,
+    update,
+    remove
 }

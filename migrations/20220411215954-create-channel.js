@@ -1,18 +1,21 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Workspaces', {
+    await queryInterface.createTable('Channels', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      name: {
+        type: Sequelize.STRING
+      },
       createdBy: {
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
+      workspaceId: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -23,8 +26,7 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
-
-    await queryInterface.addConstraint('Workspaces', {
+    await queryInterface.addConstraint('Channels', {
         fields: ['createdBy'],
         type: 'foreign key',
         name: 'custom_fkey_constraint_name',
@@ -35,9 +37,19 @@ module.exports = {
         onDelete: 'cascade',
         onUpdate: 'cascade'
     });
+    await queryInterface.addConstraint('Channels', {
+        fields: ['workspaceId'],
+        type: 'foreign key',
+        name: 'custom_fkey_constraint_name_for_workspaces',
+        references: {
+            table: 'Workspaces',
+            field: 'id'
+        },
+        onDelete: 'cascade',
+        onUpdate: 'cascade'
+    });
   },
   async down(queryInterface) {
-    await queryInterface.removeConstraint('Workspaces', 'custom_fkey_constraint_name')
-    await queryInterface.dropTable('Workspaces');
+    await queryInterface.dropTable('Channels');
   }
 };

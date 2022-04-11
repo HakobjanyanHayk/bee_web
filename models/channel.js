@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Workspace extends Model {
+  class Channel extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-        Workspace.belongsTo(models.User, {
+        Channel.belongsTo(models.User, {
             as: 'author',
             foreignKey: {
                 name: 'createdBy',
@@ -19,8 +19,8 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.UUID
             }
         })
-        Workspace.hasMany(models.Channel,{
-            as: 'channels',
+        Channel.belongsTo(models.Workspace, {
+            as: 'workspace',
             foreignKey: {
                 name: 'workspaceId',
                 allowNull: false,
@@ -29,12 +29,13 @@ module.exports = (sequelize, DataTypes) => {
         })
     }
   }
-  Workspace.init({
+  Channel.init({
     createdBy: DataTypes.INTEGER,
+    workspaceId: DataTypes.INTEGER,
     name: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Workspace',
+    modelName: 'Channel',
   });
-  return Workspace;
+  return Channel;
 };

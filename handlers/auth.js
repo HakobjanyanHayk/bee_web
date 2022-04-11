@@ -19,7 +19,9 @@ const register = async (req, res) => {
 
         if(validatedData.hasOwnProperty('email')) {
             const isUnique = await isEmailUnique(validatedData.email)
-            if(!isUnique) return res.status(500).json({message: 'Duplicated email !'})
+            if(!isUnique) {
+                return res.status(500).json({message: 'Duplicated email !'})
+            }
         }
 
         const password = await bcrypt.hash(validatedData.password, 10)
@@ -40,16 +42,23 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const {email, password} = req.body
-    const user = await User.findOne({where: {email: email}})
+    try {
+        const {email, password} = req.body
+        const user = await User.findOne({where: {email: email}})
 
-    if(!user?.dataValues) return res.json({message: 'Incorrect email'})
-    if(await bcrypt.compare(password, user.dataValues.password)) {
-        const token = jwt.sign({user}, "my_token", {expiresIn: '1d'})
-        return res.json({data: user, token})
+        if(!user?.dataValues) {
+            return res.json({message: 'Incorrect email'})
+        }
+
+        if(await bcrypt.compare(password, user.dataValues.password)) {
+            const token = jwt.sign({user}, "my_token", {expiresIn: '1d'})
+            return res.json({data: user, token})
+        }
+
+        return res.json({message: 'Incorrect password'})
+    } catch (message) {
+        return res.json({message})
     }
-
-    return res.json({message: 'Incorrect password'})
 }
 
 module.exports = {
