@@ -1,66 +1,52 @@
 const { User } = require('../models')
-
-const list = async (req,res) => {
-
-    // const users = await User.findAll({})
-    //
-    // return res.json({users})
-}
-
-const createOne = async (req, res) => {
-
-    // const user = await User.create(req.body)
-    //
-    // return res.json({user})
-}
-
-const findUser = async (req, res) =>    {
-
-    // const user = await User.findByPk(parseInt(req.params.id))
-    //
-    // if(!user) {
-    //     return res.status(404).send({message: 'Not Found'});
-    // }
-    //
-    // return res.json({user})
-}
+const bcrypt = require('bcrypt')
+const Joi = require('joi');
+const {checkDisplayName, isEmailUnique} = require('../utils')
 
 const updateUser = async (req, res) => {
-    // const user = await User.update(req.body,
-    //     {
-    //         where: {
-    //             id: req.params.id
-    //         }
-    //     })
-    //
-    // if(!user[0]){
-    //     return res.status(404).json({message: 'Not Found'})
-    // }
-    // return res.json({message: 'User have been successfully updated1'})
+    try {
+        const userDataSchema = Joi.object({
+            name: Joi.string(),
+            email: Joi.string().email(),
+            password: Joi.string().min(3).max(15),
+            displayName: Joi.string()
+        })
 
-}
+        const validatedData = await userDataSchema.validateAsync(req.body).catch(message => {
+            return res.status(500).json({message})
+        });
 
-const deleteUser = async (req, res) => {
+        if(validatedData.hasOwnProperty('email')) {
+            const isUnique = await isEmailUnique(validatedData.email)
+            if(!isUnique) return res.status(500).json({message: 'Duplicated email !'})
+        }
 
-    // const id = parseInt(req.params.id)
-    //
-    // const user = await User.destroy({
-    //     where: {
-    //         id: id
-    //     }
-    // });
-    //
-    // if(!user) {
-    //     res.status(404).json({message: 'Not Found'})
-    // }
-    //
-    // return res.status(201).json({message: 'User deleted successfully'})
+        if(req.user.displayName !== validatedData.displayName) {
+            validatedData.displayName = await checkDisplayName(validatedData.displayName)
+        } else {
+            delete validatedData.displayName
+        }
+
+        if(validatedData.hasOwnProperty('password')) {
+            validatedData.password = await bcrypt.hash(validatedData.password, 10)
+        }
+
+        const user = await User.update(validatedData,
+            {
+                where: {
+                    id: req.user.id
+                }
+            })
+
+        if(!user[0]){
+            return res.status(404).json({message: 'Not Found'})
+        }
+        return res.json({message: 'User have been successfully updated'})
+    } catch (message) {
+        return res.status(500).json({message})
+    }
 }
 
 module.exports = {
-    list,
-    findUser,
-    createOne,
-    updateUser,
-    deleteUser
+    updateUser
 }

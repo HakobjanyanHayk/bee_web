@@ -25,6 +25,17 @@ async function checkDisplayName(displayName) {
     return getNewName(displayName.split(" ").join(""), count)
 }
 
+async function isEmailUnique(email) {
+    const { count } = await User.findAndCountAll({
+        where: {
+            email: email
+        },
+    });
+
+    return count === 0
+}
+
 module.exports = {
-    checkDisplayName
+    checkDisplayName,
+    isEmailUnique
 }

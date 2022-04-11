@@ -17,6 +17,11 @@ const register = async (req, res) => {
             return res.status(500).json({message})
         });
 
+        if(validatedData.hasOwnProperty('email')) {
+            const isUnique = await isEmailUnique(validatedData.email)
+            if(!isUnique) return res.status(500).json({message: 'Duplicated email !'})
+        }
+
         const password = await bcrypt.hash(validatedData.password, 10)
         const displayName = await checkDisplayName(validatedData.name)
 
@@ -25,8 +30,6 @@ const register = async (req, res) => {
             displayName,
             password,
         }
-
-        console.log('data', data)
 
         const user = await User.create(data)
 
