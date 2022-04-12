@@ -8,4 +8,6 @@ route.get('/:workspaceId', isAuthenticated, handlers.find)
 route.put('/:workspaceId', isAuthenticated, handlers.update)
 route.delete('/:workspaceId', isAuthenticated, handlers.remove)
 
+route.post('/invite', isAuthenticated, handlers.invite)
+
 module.exports = route

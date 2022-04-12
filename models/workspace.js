@@ -27,6 +27,15 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.UUID
             }
         })
+        Workspace.belongsToMany(models.User, {
+            as: 'participants',
+            through: 'WorkspaceUsers',
+            foreignKey: {
+                name: 'workspaceId',
+                allowNull: false,
+                type: DataTypes.UUID
+            }
+        });
     }
   }
   Workspace.init({

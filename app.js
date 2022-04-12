@@ -1,10 +1,8 @@
 const express = require('express');
 const port = process.env.PORT || 8080;
 const app = express()
-const api = require('./api')
+const api = require('./routes')
 const initializeServices = require("./services/initialize");
-const {User} = require('./models')
-const bcrypt = require('bcrypt')
 
 const startApp = () => {
     app.use(express.json());
