@@ -36,6 +36,14 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.UUID
             }
         });
+        User.hasOne(models.File,{
+            as: 'avatar',
+            foreignKey: {
+                name: 'userId',
+                allowNull: false,
+                type: DataTypes.UUID
+            }
+        })
     }
   }
   User.init({

@@ -49,6 +49,21 @@ const update = async (req, res) => {
     }
 }
 
+const upload = async (req, res) => {
+    const {filename} = req.user
+
+    const user = await User.findByPk(req.user.id)
+
+    if(!user) {
+        return res.status(401).json({message: 'Unauthenticated'})
+    }
+
+    await user.createAvatar({url: filename})
+
+    res.json({message: 'File have been uploaded successfully'})
+}
+
 module.exports = {
-    update
+    update,
+    upload
 }
